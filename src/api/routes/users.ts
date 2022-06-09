@@ -6,3 +6,7 @@ export const userRouter = Router({
 });
 
 userRouter.get("/getUserByEmail", UserController.getUserByEmail);
+userRouter.get("/getSalariesByJob", UserController.getSalariesByJob);
+userRouter.get("/createNewUser", UserController.createNewUser);
+userRouter.get("/updateUser", UserController.updateUser);
+userRouter.get("/deleteUser", UserController.deleteUser);
