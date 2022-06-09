@@ -1,21 +1,22 @@
-import { Request, Response } from "express";
-import { UsersDatabase } from "../../databases/Users";
+import { Request, Response } from 'express';
+import { UpdateRequest } from '../../../models/interfaces';
+import { UsersDatabase } from '../../databases/Users';
 
-const collectionName = process.env.userCollection || "";
+const collectionName = process.env.userCollection || '';
 
 export async function getUserByEmail(req: Request, res: Response) {
   const client = new UsersDatabase(collectionName);
   try {
     const email = req.query.email as string;
     console.log({
-      location: "users.controller.getUserByEmail",
+      location: 'users.controller.getUserByEmail',
       info: `Got request ${JSON.stringify(req.query)}`,
     });
     await client.start();
     const result = await client.getUserByEmail(email);
     if (result) {
       res.status(200).send({
-        message: "User retrieved successfully.",
+        message: 'User retrieved successfully.',
         success: true,
         user: result,
       });
@@ -27,7 +28,7 @@ export async function getUserByEmail(req: Request, res: Response) {
     }
   } catch (error: unknown) {
     res.status(500).send({
-      message: "A server side error ocurred. Please try again.",
+      message: 'A server side error ocurred. Please try again.',
       success: false,
       erorr: error,
       query: req.query,
@@ -42,14 +43,14 @@ export async function getSalariesByJob(req: Request, res: Response) {
   try {
     const occupancy = req.query.occupancy as string;
     console.log({
-      location: "users.controller.getSalariesByJob",
+      location: 'users.controller.getSalariesByJob',
       info: `Got request ${JSON.stringify(req.query)}`,
     });
     await client.start();
     const result = await client.getSalariesByJob(occupancy);
     if (result) {
       res.status(200).send({
-        message: "Users retrieved successfully.",
+        message: 'Users retrieved successfully.',
         success: true,
         user: result,
       });
@@ -61,7 +62,7 @@ export async function getSalariesByJob(req: Request, res: Response) {
     }
   } catch (error: unknown) {
     res.status(500).send({
-      message: "A server side error ocurred. Please try again.",
+      message: 'A server side error ocurred. Please try again.',
       success: false,
       erorr: error,
       query: req.query,
@@ -74,16 +75,16 @@ export async function getSalariesByJob(req: Request, res: Response) {
 export async function createNewUser(req: Request, res: Response) {
   const client = new UsersDatabase(collectionName);
   try {
-    const newUser= req.query as object;
+    const newUser = req.query as object;
     console.log({
-      location: "users.controller",
+      location: 'users.controller',
       info: `Got request ${JSON.stringify(req.query)}`,
     });
     await client.start();
     const result = await client.createNewUser(newUser);
     if (result) {
       res.status(200).send({
-        message: `Inserted document with _id: ${result.insertedId}`, 
+        message: `Inserted document with _id: ${result.insertedId}`,
         success: true,
         user: result,
       });
@@ -95,7 +96,7 @@ export async function createNewUser(req: Request, res: Response) {
     }
   } catch (error: unknown) {
     res.status(500).send({
-      message: "A server side error ocurred. Please try again.",
+      message: 'A server side error ocurred. Please try again.',
       success: false,
       erorr: error,
       query: req.query,
@@ -108,31 +109,37 @@ export async function createNewUser(req: Request, res: Response) {
 export async function updateUser(req: Request, res: Response) {
   const client = new UsersDatabase(collectionName);
   try {
-    const updatedUser = req.query as object;
+    const updatedUser = { ...req.body } as unknown as UpdateRequest;
     console.log({
-      location: "users.controller",
-      info: `Got request ${JSON.stringify(req.query)}`,
+      location: 'users.controller',
+      info: `Got request ${JSON.stringify(req.body)}`,
     });
     await client.start();
     const result = await client.updateUser(updatedUser);
-    if (result) {
+    if (result.modifiedCount > 0) {
       res.status(200).send({
-        message: "User updated successfully.",
+        message: 'User updated successfully.',
         success: true,
-        user: result,
+        request: req.body,
+      });
+    } else if (result.matchedCount === 0) {
+      res.status(404).send({
+        message: `User with id "${req.body._id}" was not found.`,
+        success: false,
       });
     } else {
-      res.status(404).send({
-        message: `User with email "${req.query.email}" was not found.`,
+      res.status(500).send({
+        message: 'A server side error ocurred. Please try again.',
         success: false,
+        query: `${JSON.stringify(req.body)}`,
       });
     }
   } catch (error: unknown) {
     res.status(500).send({
-      message: "A server side error ocurred. Please try again.",
+      message: 'A server side error ocurred. Please try again.',
       success: false,
-      erorr: error,
-      query: req.query,
+      error: error,
+      query: `${JSON.stringify(req.body)}`,
     });
   } finally {
     await client.stop();
@@ -144,14 +151,14 @@ export async function deleteUser(req: Request, res: Response) {
   try {
     const email = req.query.email as string;
     console.log({
-      location: "users.controller",
+      location: 'users.controller',
       info: `Got request ${JSON.stringify(req.query)}`,
     });
     await client.start();
     const result = await client.deleteUser(email);
     if (result) {
       res.status(200).send({
-        message: "User deleted successfully.",
+        message: 'User deleted successfully.',
         success: true,
         user: result,
       });
@@ -163,7 +170,7 @@ export async function deleteUser(req: Request, res: Response) {
     }
   } catch (error: unknown) {
     res.status(500).send({
-      message: "A server side error ocurred. Please try again.",
+      message: 'A server side error ocurred. Please try again.',
       success: false,
       erorr: error,
       query: req.query,

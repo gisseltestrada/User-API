@@ -1,5 +1,6 @@
-import { query } from "express";
-import { Collection, MongoClient } from "mongodb";
+import { query } from 'express';
+import { Collection, MongoClient, ObjectId } from 'mongodb';
+import { UpdateRequest } from '../../models/interfaces';
 
 export class UsersDatabase {
   connectionString!: string;
@@ -10,10 +11,9 @@ export class UsersDatabase {
 
   constructor(collectionName: string) {
     this.collectionName = collectionName;
-    this.connectionString = process.env.connectionString || "";
-    this.dbName = process.env.dbName || "";
+    this.connectionString = process.env.connectionString || '';
+    this.dbName = process.env.dbName || '';
     this.client = new MongoClient(this.connectionString);
-    
   }
 
   async start() {
@@ -41,17 +41,17 @@ export class UsersDatabase {
       .aggregate([
         {
           $match: {
-            "occupancy.title": occupancy,
+            'occupancy.title': occupancy,
           },
         },
         {
           $project: {
-            "occupancy.salary": 1,
+            'occupancy.salary': 1,
           },
         },
         {
           $sort: {
-            "occupancy.salary": 1,
+            'occupancy.salary': 1,
           },
         },
       ])
@@ -77,23 +77,12 @@ export class UsersDatabase {
     return await this.collection.insertOne(query);
   }
 
-  async updateUser(updatedUser: any) {
-     const query = {
-       email: updatedUser.email as string,
-       password: updatedUser.password as string,
-       profile: {
-         name: updatedUser.name as string,
-         dob: updatedUser.dob as string,
-         address: updatedUser.address as string,
-       },
-       occupancy: {
-         title: updatedUser.title as string,
-         company: updatedUser.company as string,
-         salary: updatedUser.salary as number,
-         role: [updatedUser.role as string],
-       },
-     };
-    return await this.collection.updateOne({email: updatedUser.email}, {$set:query});
+  async updateUser(updateRequest: UpdateRequest) {
+    const { _id, ...filters } = updateRequest;
+
+    const query = { _id: new ObjectId(_id) };
+
+    return await this.collection.updateOne(query, { $set: filters });
   }
 
   async deleteUser(email: string) {

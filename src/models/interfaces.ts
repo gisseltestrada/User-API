@@ -25,3 +25,15 @@ interface Occupancy {
   salary: string;
   company: string;
 }
+
+export interface UpdateRequest {
+  _id: string;
+  email?: string;
+  password?: string;
+  'profile.about'?: string;
+  'profile.address'?: string;
+  'occupancy.title'?: string;
+  'occupancy.role'?: string;
+  'occupancy.salary'?: number;
+  'occupancy.company'?: string;
+}
