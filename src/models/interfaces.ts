@@ -26,14 +26,30 @@ interface Occupancy {
   company: string;
 }
 
+export interface NewUserRequest {
+  email: string;
+  password: string;
+  profile:{
+    name: string;
+    dob: string;
+    address: string;
+  };
+  occupancy: {
+    title: string;
+    company: string;
+    salary: number;
+    role: string;
+  };
+}
+
 export interface UpdateRequest {
   _id: string;
   email?: string;
   password?: string;
-  'profile.about'?: string;
-  'profile.address'?: string;
-  'occupancy.title'?: string;
-  'occupancy.role'?: string;
-  'occupancy.salary'?: number;
-  'occupancy.company'?: string;
+  "profile.about"?: string;
+  "profile.address"?: string;
+  "occupancy.title"?: string;
+  "occupancy.role"?: string;
+  "occupancy.salary"?: number;
+  "occupancy.company"?: string;
 }

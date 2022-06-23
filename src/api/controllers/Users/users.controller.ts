@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { UpdateRequest } from '../../../models/interfaces';
+import { NewUserRequest, UpdateRequest } from '../../../models/interfaces';
 import { UsersDatabase } from '../../databases/Users';
 
 const collectionName = process.env.userCollection || '';
@@ -75,7 +75,7 @@ export async function getSalariesByJob(req: Request, res: Response) {
 export async function createNewUser(req: Request, res: Response) {
   const client = new UsersDatabase(collectionName);
   try {
-    const newUser = req.query as object;
+    const newUser = { ...req.body } as unknown as NewUserRequest;
     console.log({
       location: 'users.controller',
       info: `Got request ${JSON.stringify(req.query)}`,
