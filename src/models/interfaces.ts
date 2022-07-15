@@ -35,27 +35,42 @@ export interface Login {
 export interface NewUserRequest {
   email: string;
   password: string;
-  profile:{
+  profile: ProfileRequest;
+  occupancy: OccupancyRequest;
+}
+
+export interface OccupancyRequest {
+  title: string;
+  company: string;
+  salary: number;
+  role: string;
+}
+export interface ProfileRequest {
+  firstName: string;
+  lastName: string;
+  dob: string;
+  address: string;
+}
+
+export interface NewUser {
+  email: string;
+  password: string;
+  profile: {
     name: string;
     dob: string;
     address: string;
   };
-  occupancy: {
-    title: string;
-    company: string;
-    salary: number;
-    role: string;
-  };
+  occupancy: OccupancyRequest;
 }
 
 export interface UpdateRequest {
   _id: string;
   email?: string;
   password?: string;
-  "profile.about"?: string;
-  "profile.address"?: string;
-  "occupancy.title"?: string;
-  "occupancy.role"?: string;
-  "occupancy.salary"?: number;
-  "occupancy.company"?: string;
+  'profile.about'?: string;
+  'profile.address'?: string;
+  'occupancy.title'?: string;
+  'occupancy.role'?: string;
+  'occupancy.salary'?: number;
+  'occupancy.company'?: string;
 }

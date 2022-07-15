@@ -1,6 +1,13 @@
 import { query } from 'express';
 import { Collection, MongoClient, ObjectId } from 'mongodb';
-import { NewUserRequest, UpdateRequest, Login } from '../../models/interfaces';
+
+import {
+  NewUser,
+  NewUserRequest,
+  UpdateRequest,
+  Login
+} from '../../models/interfaces';
+
 
 export class UsersDatabase {
   connectionString!: string;
@@ -72,6 +79,7 @@ export class UsersDatabase {
   async createNewUser(newUser: NewUserRequest) {
     const query = { ...newUser };
     return await this.collection.insertOne(query);
+
   }
 
   async updateUser(updateRequest: UpdateRequest) {
