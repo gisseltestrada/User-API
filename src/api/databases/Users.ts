@@ -1,10 +1,13 @@
 import { query } from 'express';
 import { Collection, MongoClient, ObjectId } from 'mongodb';
+
 import {
   NewUser,
   NewUserRequest,
   UpdateRequest,
+  Login
 } from '../../models/interfaces';
+
 
 export class UsersDatabase {
   connectionString!: string;
@@ -15,8 +18,8 @@ export class UsersDatabase {
 
   constructor(collectionName: string) {
     this.collectionName = collectionName;
-    this.connectionString = process.env.connectionString || '';
-    this.dbName = process.env.dbName || '';
+    this.connectionString = process.env.connectionString || "";
+    this.dbName = process.env.dbName || "";
     this.client = new MongoClient(this.connectionString);
   }
 
@@ -41,40 +44,42 @@ export class UsersDatabase {
   }
 
   async getSalariesByJob(occupancy: string) {
+    //change to return const salaries = await this.collection
     return await this.collection
       .aggregate([
         {
           $match: {
-            'occupancy.title': occupancy,
+            "occupancy.title": occupancy,
           },
         },
         {
           $project: {
-            'occupancy.salary': 1,
+            "occupancy.salary": 1,
           },
         },
         {
           $sort: {
-            'occupancy.salary': 1,
+            "occupancy.salary": 1,
           },
         },
-      ])
-      .toArray();
+      ]).toArray();
+      //TODO:
+      //let average, calculate average
+      //return object {average: #, salaries:[]}
+      //
+      // return salaries;
+  }
+
+  async loginUser(existingUser: Login) {
+    const { email, password} = existingUser;
+
+    return await this.collection.findOne({email, password});
   }
 
   async createNewUser(newUser: NewUserRequest) {
-    const { profile, ...otherFields } = newUser;
-    const { lastName, firstName, ...otherProfileFields } = profile;
+    const query = { ...newUser };
+    return await this.collection.insertOne(query);
 
-    const toInsert = {
-      ...otherFields,
-      profile: {
-        ...otherProfileFields,
-        name: firstName + lastName,
-      },
-    } as NewUser;
-
-    return await this.collection.insertOne(toInsert);
   }
 
   async updateUser(updateRequest: UpdateRequest) {

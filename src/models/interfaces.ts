@@ -19,11 +19,17 @@ interface Profile {
   countyOfOrigin: string;
 }
 
+
 interface Occupancy {
   role: string[];
   title: string;
   salary: string;
   company: string;
+}
+
+export interface Login {
+  email: string;
+  password: string;
 }
 
 export interface NewUserRequest {
