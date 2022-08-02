@@ -1,13 +1,14 @@
-import { query } from 'express';
-import { Collection, MongoClient, ObjectId } from 'mongodb';
+import { match } from "assert";
+import { query } from "express";
+import { Collection, MongoClient, ObjectId } from "mongodb";
+import { toPascalCase } from "../../common/helper";
 
 import {
   NewUser,
   NewUserRequest,
   UpdateRequest,
-  Login
-} from '../../models/interfaces';
-
+  Login,
+} from "../../models/interfaces";
 
 export class UsersDatabase {
   connectionString!: string;
@@ -43,13 +44,20 @@ export class UsersDatabase {
     return await this.collection.findOne(query);
   }
 
+  async getUserById(userId: string) {
+    const id = new ObjectId(userId);
+    const query = { "_id": id};
+    return await this.collection.findOne(query);
+  }
+
   async getSalariesByJob(occupancy: string) {
     //change to return const salaries = await this.collection
-    return await this.collection
+    const matchBy = toPascalCase(occupancy);
+    const responseArr = await this.collection
       .aggregate([
         {
           $match: {
-            "occupancy.title": occupancy,
+            "occupancy.title": matchBy,
           },
         },
         {
@@ -62,30 +70,45 @@ export class UsersDatabase {
             "occupancy.salary": 1,
           },
         },
-      ]).toArray();
-      //TODO:
-      //let average, calculate average
-      //return object {average: #, salaries:[]}
-      //
-      // return salaries;
+      ])
+      .toArray();
+    //TODO:
+    //let average, calculate average
+    //return object {average: #, salaries:[]}
+    //
+    // return salaries;
+    const salariesArr = [];
+    for (const person of responseArr) {
+      salariesArr.push(person.occupancy.salary);
+    }
+    console.log(salariesArr);
+    // const arrAvg = arr => arr.reduce((a,b) => a + b, 0) / arr.length
+    const averageSalary = (salariesArr: any[]) =>
+      salariesArr.reduce((a, b) => a + b) / salariesArr.length;
+    return {
+      average: averageSalary(salariesArr).toFixed(2),
+      salaries: salariesArr,
+    };
   }
 
   async loginUser(existingUser: Login) {
-    const { email, password} = existingUser;
+    const { email, password } = existingUser;
 
-    return await this.collection.findOne({email, password});
+    return await this.collection.findOne({ email, password });
   }
 
   async createNewUser(newUser: NewUserRequest) {
+    const title = toPascalCase(newUser.occupancy.title);
+    newUser.occupancy.title = title;
     const query = { ...newUser };
     return await this.collection.insertOne(query);
-
   }
 
   async updateUser(updateRequest: UpdateRequest) {
     const { _id, ...filters } = updateRequest;
 
     const query = { _id: new ObjectId(_id) };
+    console.log(query);
 
     return await this.collection.updateOne(query, { $set: filters });
   }

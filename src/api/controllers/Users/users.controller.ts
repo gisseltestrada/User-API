@@ -37,6 +37,39 @@ export async function getUserByEmail(req: Request, res: Response) {
     await client.stop();
   }
 }
+export async function getUserById(req: Request, res: Response) {
+  const client = new UsersDatabase(collectionName);
+  try {
+    const userId = req.query._id as string;
+    console.log({
+      location: "users.controller.getUserById",
+      info: `Got request ${JSON.stringify(req.query)}`,
+    });
+    await client.start();
+    const result = await client.getUserById(userId);
+    if (result) {
+      res.status(200).send({
+        message: "User retrieved successfully.",
+        success: true,
+        user: result,
+      });
+    } else {
+      res.status(404).send({
+        message: `User with id "${userId}" was not found.`,
+        success: false,
+      });
+    }
+  } catch (error: unknown) {
+    res.status(500).send({
+      message: "A server side error ocurred. Please try again.",
+      success: false,
+      erorr: error,
+      query: req.query,
+    });
+  } finally {
+    await client.stop();
+  }
+}
 
 export async function getSalariesByJob(req: Request, res: Response) {
   const client = new UsersDatabase(collectionName);
@@ -50,7 +83,7 @@ export async function getSalariesByJob(req: Request, res: Response) {
 
     const result = await client.getSalariesByJob(occupancy);
     //if result.salaries.length;
-    if (result.length) {
+    if (result.salaries.length) {
       res.status(200).send({
         message: "Users retrieved successfully.",
         success: true,
@@ -80,7 +113,7 @@ export async function loginUser(req: Request, res: Response) {
     const existingUser = { ...req.body } as unknown as Login;
     console.log({
       location: "users.controller",
-      info: `Got request ${JSON.stringify(req.query)}`,
+      info: `Got request ${JSON.stringify(req.query)} in loginUser`,
     });
     await client.start();
     const result = await client.loginUser(existingUser);
