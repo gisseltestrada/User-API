@@ -1,7 +1,7 @@
 export function toPascalCase(word: string) {
   let roles = word.split(" ");
   let fixedRoles: string[] = [];
-  console.log(roles);
+  
   for (let role of roles) {
     if (role) {
       const firstChar = role.slice(0, 1);
@@ -12,6 +12,6 @@ export function toPascalCase(word: string) {
   }
 
   const result = fixedRoles.join(" ").trim();
-  console.log(result);
   return result;
 }
+

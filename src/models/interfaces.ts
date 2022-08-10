@@ -67,10 +67,12 @@ export interface UpdateRequest {
   _id: string;
   email?: string;
   password?: string;
-  'profile.about'?: string;
-  'profile.address'?: string;
-  'occupancy.title'?: string;
-  'occupancy.role'?: string;
-  'occupancy.salary'?: number;
-  'occupancy.company'?: string;
+  "profile.about"?: string;
+  "profile.address"?: string;
+  "occupancy.title"?: string;
+  "occupancy.role"?: string;
+  "occupancy.salary"?: number;
+  "occupancy.company"?: string;
+  "occupancy.location"?: string;
+  "skills.skill1"?: string;
 }

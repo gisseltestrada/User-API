@@ -77,13 +77,13 @@ export class UsersDatabase {
     //return object {average: #, salaries:[]}
     //
     // return salaries;
-    const salariesArr = [];
+    const salariesArr:number[] = [];
     for (const person of responseArr) {
       salariesArr.push(person.occupancy.salary);
     }
-    console.log(salariesArr);
+    // console.log(salariesArr);
     // const arrAvg = arr => arr.reduce((a,b) => a + b, 0) / arr.length
-    const averageSalary = (salariesArr: any[]) =>
+    const averageSalary = (salariesArr: number[]) =>
       salariesArr.reduce((a, b) => a + b) / salariesArr.length;
     return {
       average: averageSalary(salariesArr).toFixed(2),
@@ -92,7 +92,9 @@ export class UsersDatabase {
   }
 
   async loginUser(existingUser: Login) {
-    const { email, password } = existingUser;
+    let { email, password } = existingUser;
+    const lowerCaseEmail = email.toLowerCase().trim();
+    email = lowerCaseEmail;
 
     return await this.collection.findOne({ email, password });
   }
@@ -100,6 +102,9 @@ export class UsersDatabase {
   async createNewUser(newUser: NewUserRequest) {
     const title = toPascalCase(newUser.occupancy.title);
     newUser.occupancy.title = title;
+    const email = newUser.email.toLowerCase().trim();
+    newUser.email = email;
+
     const query = { ...newUser };
     return await this.collection.insertOne(query);
   }
