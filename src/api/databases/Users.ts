@@ -1,14 +1,12 @@
-import { match } from "assert";
-import { query } from "express";
-import { Collection, MongoClient, ObjectId } from "mongodb";
-import { toPascalCase } from "../../common/helper";
+import { Collection, MongoClient, ObjectId, UpdateFilter } from 'mongodb';
+import { toPascalCase } from '../../common/helper';
 
 import {
-  NewUser,
   NewUserRequest,
   UpdateRequest,
   Login,
-} from "../../models/interfaces";
+  EditForm,
+} from '../../models/interfaces';
 
 export class UsersDatabase {
   connectionString!: string;
@@ -19,8 +17,8 @@ export class UsersDatabase {
 
   constructor(collectionName: string) {
     this.collectionName = collectionName;
-    this.connectionString = process.env.connectionString || "";
-    this.dbName = process.env.dbName || "";
+    this.connectionString = process.env.connectionString || '';
+    this.dbName = process.env.dbName || '';
     this.client = new MongoClient(this.connectionString);
   }
 
@@ -46,7 +44,7 @@ export class UsersDatabase {
 
   async getUserById(userId: string) {
     const id = new ObjectId(userId);
-    const query = { "_id": id};
+    const query = { _id: id };
     return await this.collection.findOne(query);
   }
 
@@ -57,17 +55,17 @@ export class UsersDatabase {
       .aggregate([
         {
           $match: {
-            "occupancy.title": matchBy,
+            'occupancy.title': matchBy,
           },
         },
         {
           $project: {
-            "occupancy.salary": 1,
+            'occupancy.salary': 1,
           },
         },
         {
           $sort: {
-            "occupancy.salary": 1,
+            'occupancy.salary': 1,
           },
         },
       ])
@@ -77,7 +75,7 @@ export class UsersDatabase {
     //return object {average: #, salaries:[]}
     //
     // return salaries;
-    const salariesArr:number[] = [];
+    const salariesArr: number[] = [];
     for (const person of responseArr) {
       salariesArr.push(person.occupancy.salary);
     }
@@ -110,12 +108,25 @@ export class UsersDatabase {
   }
 
   async updateUser(updateRequest: UpdateRequest) {
-    const { _id, ...filters } = updateRequest;
+    try {
+      const { _id, skills, currentSkills, ...filters } = updateRequest;
+      const updatedSkills = {
+        ...currentSkills,
+        ...skills,
+      };
+      const query = { _id: new ObjectId(_id) };
+      const toUpdate: UpdateFilter<any> = {
+        $set: {
+          ...filters,
+          skills: updatedSkills,
+        },
+      };
+      console.log(toUpdate);
 
-    const query = { _id: new ObjectId(_id) };
-    console.log(query);
-
-    return await this.collection.updateOne(query, { $set: filters });
+      return await this.collection.updateOne(query, toUpdate);
+    } catch (error) {
+      console.log('updateUser:', error);
+    }
   }
 
   async deleteUser(email: string) {
