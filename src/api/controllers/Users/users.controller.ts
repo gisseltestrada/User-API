@@ -1,5 +1,9 @@
 import { Request, Response } from 'express';
-import { NewUserRequest, UpdateRequest, Login } from '../../../models/interfaces';
+import {
+  NewUserRequest,
+  UpdateRequest,
+  Login,
+} from '../../../models/interfaces';
 import { UsersDatabase } from '../../databases/Users';
 
 const collectionName = process.env.userCollection || '';
@@ -37,22 +41,55 @@ export async function getUserByEmail(req: Request, res: Response) {
     await client.stop();
   }
 }
+export async function getUserById(req: Request, res: Response) {
+  const client = new UsersDatabase(collectionName);
+  try {
+    const userId = req.query._id as string;
+    console.log({
+      location: 'users.controller.getUserById',
+      info: `Got request ${JSON.stringify(req.query)}`,
+    });
+    await client.start();
+    const result = await client.getUserById(userId);
+    if (result) {
+      res.status(200).send({
+        message: 'User retrieved successfully.',
+        success: true,
+        user: result,
+      });
+    } else {
+      res.status(404).send({
+        message: `User with id "${userId}" was not found.`,
+        success: false,
+      });
+    }
+  } catch (error: unknown) {
+    res.status(500).send({
+      message: 'A server side error ocurred. Please try again.',
+      success: false,
+      erorr: error,
+      query: req.query,
+    });
+  } finally {
+    await client.stop();
+  }
+}
 
 export async function getSalariesByJob(req: Request, res: Response) {
   const client = new UsersDatabase(collectionName);
   try {
     const occupancy = req.query.occupancy as string;
     console.log({
-      location: "users.controller.getSalariesByJob",
+      location: 'users.controller.getSalariesByJob',
       info: `Got request ${JSON.stringify(req.query)}`,
     });
     await client.start();
 
     const result = await client.getSalariesByJob(occupancy);
     //if result.salaries.length;
-    if (result.length) {
+    if (result.salaries.length) {
       res.status(200).send({
-        message: "Users retrieved successfully.",
+        message: 'Users retrieved successfully.',
         success: true,
         user: result,
       });
@@ -79,8 +116,8 @@ export async function loginUser(req: Request, res: Response) {
   try {
     const existingUser = { ...req.body } as unknown as Login;
     console.log({
-      location: "users.controller",
-      info: `Got request ${JSON.stringify(req.query)}`,
+      location: 'users.controller',
+      info: `Got request ${JSON.stringify(req.body)} in loginUser`,
     });
     await client.start();
     const result = await client.loginUser(existingUser);
@@ -98,7 +135,7 @@ export async function loginUser(req: Request, res: Response) {
     }
   } catch (error: unknown) {
     res.status(500).send({
-      message: "A server side error ocurred. Please try again.",
+      message: 'A server side error ocurred. Please try again.',
       success: false,
       erorr: error,
       query: req.query,
@@ -152,13 +189,13 @@ export async function updateUser(req: Request, res: Response) {
     });
     await client.start();
     const result = await client.updateUser(updatedUser);
-    if (result.modifiedCount > 0) {
+    if (result && result.modifiedCount > 0) {
       res.status(200).send({
         message: 'User updated successfully.',
         success: true,
         request: req.body,
       });
-    } else if (result.matchedCount === 0) {
+    } else if (result && result.matchedCount === 0) {
       res.status(404).send({
         message: `User with id "${req.body._id}" was not found.`,
         success: false,

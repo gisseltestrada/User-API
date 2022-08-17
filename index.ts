@@ -2,10 +2,11 @@
 import express from "express";
 import { userRouter } from "./src/api/routes/users";
 
+
 const app = express();
 
 const port: string = process.env.port || '4200';
-
+var cors = require("cors");
 app.use(cors());
 app.use(express.json());
 
