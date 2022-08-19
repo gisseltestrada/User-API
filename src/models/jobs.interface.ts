@@ -44,3 +44,29 @@ export interface GetJobRequest {
   locationFilter?: string[];
   page: Page;
 }
+
+export interface GetJobFilters {
+  searchInput: string;
+  remoteFilter?: string[];
+  maxSalaryFilter?: number;
+  locationFilter?: string[];
+}
+
+export interface MongoFilter {
+  title: string;
+  $remoteIndicator?: $RemoteIndicator[];
+  remoteIndicator?: string;
+  salary?: $Salary;
+  $country?: $Country[];
+}
+
+export interface $RemoteIndicator {
+  remoteIndicator: string;
+}
+export interface $Salary {
+  $lt: number;
+}
+
+export interface $Country {
+  country: string;
+}

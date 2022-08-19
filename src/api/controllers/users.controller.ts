@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { NewUserRequest, UpdateRequest, Login } from '../../../models/interfaces';
-import { UsersDatabase } from '../../databases/Users';
+import { NewUserRequest, UpdateRequest, Login } from '../../models/interfaces';
+import { UsersDatabase } from '../databases/Users';
 
 export async function getUserByEmail(req: Request, res: Response) {
   const client = new UsersDatabase();

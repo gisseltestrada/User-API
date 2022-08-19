@@ -4,52 +4,29 @@ import { collections } from './connection';
 import { NewUserRequest, UpdateRequest, Login, EditForm } from '../../models/interfaces';
 
 export class UsersDatabase {
-  // connectionString!: string;
-  // collectionName!: string;
-  // client!: MongoClient;
-  // dbName!: string;
-  collection!: Collection;
+  protected _collection!: Collection;
 
   constructor() {
     if (collections.userCollection) {
-      this.collection = collections.userCollection;
+      this._collection = collections.userCollection;
     }
-    // this.collectionName = collectionName;
-    // this.connectionString = process.env.connectionString || '';
-    // this.dbName = process.env.dbName || '';
-    // this.client = new MongoClient(this.connectionString);
   }
-
-  // async start() {
-  //   await this.client.connect();
-  //   this.collection = this.client
-  //     .db(this.dbName)
-  //     .collection(this.collectionName);
-  //   // console.log({
-  //   //   location: "UserDatabase.start()",
-  //   //   info: `${this.collection.dbName}`,
-  //   // });
-  // }
-
-  // async stop() {
-  //   await this.client.close();
-  // }
 
   async getUserByEmail(email: string) {
     const query = { email: email };
-    return await this.collection.findOne(query);
+    return await this._collection.findOne(query);
   }
 
   async getUserById(userId: string) {
     const id = new ObjectId(userId);
     const query = { _id: id };
-    return await this.collection.findOne(query);
+    return await this._collection.findOne(query);
   }
 
   async getSalariesByJob(occupancy: string) {
-    //change to return const salaries = await this.collection
+    //change to return const salaries = await this._collection
     const matchBy = toPascalCase(occupancy);
-    const responseArr = await this.collection
+    const responseArr = await this._collection
       .aggregate([
         {
           $match: {
@@ -91,7 +68,7 @@ export class UsersDatabase {
     const lowerCaseEmail = email.toLowerCase().trim();
     email = lowerCaseEmail;
 
-    return await this.collection.findOne({ email, password });
+    return await this._collection.findOne({ email, password });
   }
 
   async createNewUser(newUser: NewUserRequest) {
@@ -101,7 +78,7 @@ export class UsersDatabase {
     newUser.email = email;
 
     const query = { ...newUser };
-    return await this.collection.insertOne(query);
+    return await this._collection.insertOne(query);
   }
 
   async updateUser(updateRequest: UpdateRequest) {
@@ -120,7 +97,7 @@ export class UsersDatabase {
       };
       console.log(toUpdate);
 
-      return await this.collection.updateOne(query, toUpdate);
+      return await this._collection.updateOne(query, toUpdate);
     } catch (error) {
       console.log('updateUser:', error);
     }
@@ -128,6 +105,6 @@ export class UsersDatabase {
 
   async deleteUser(email: string) {
     const query = { email: email };
-    return await this.collection.deleteOne(query);
+    return await this._collection.deleteOne(query);
   }
 }

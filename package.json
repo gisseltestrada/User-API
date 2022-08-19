@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "start": "nodemon index.ts"
+    "start": "nodemon index.ts",
+    "build": "npx tsc"
   },
   "author": "",
   "license": "ISC",
