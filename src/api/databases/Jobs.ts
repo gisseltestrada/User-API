@@ -24,11 +24,7 @@ export class JobDatabase {
       const { page, ...filters } = request;
       const query = this.createQuery(filters);
       const searchAggregate = this.generateAggregate(query);
-
-      const filter: Filter<Jobs> = {
-        title: request.searchInput,
-      };
-      return (await this._collection.find(filter).toArray()) as WithId<Jobs>[];
+      return await this._collection.aggregate(searchAggregate).toArray();
     } catch (error) {
       console.log(error);
     }
@@ -136,6 +132,4 @@ export class JobDatabase {
 
     return searchAggregate;
   }
-
-  // async paginatedResponse(): GetJobResponse {}
 }
