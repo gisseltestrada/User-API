@@ -1,22 +1,15 @@
 import { Request, Response } from 'express';
-import {
-  NewUserRequest,
-  UpdateRequest,
-  Login,
-} from '../../../models/interfaces';
+import { NewUserRequest, UpdateRequest, Login } from '../../../models/interfaces';
 import { UsersDatabase } from '../../databases/Users';
 
-const collectionName = process.env.userCollection || '';
-
 export async function getUserByEmail(req: Request, res: Response) {
-  const client = new UsersDatabase(collectionName);
+  const client = new UsersDatabase();
   try {
     const email = req.query.email as string;
     console.log({
       location: 'users.controller.getUserByEmail',
       info: `Got request ${JSON.stringify(req.query)}`,
     });
-    await client.start();
     const result = await client.getUserByEmail(email);
     if (result) {
       res.status(200).send({
@@ -37,19 +30,16 @@ export async function getUserByEmail(req: Request, res: Response) {
       erorr: error,
       query: req.query,
     });
-  } finally {
-    await client.stop();
   }
 }
 export async function getUserById(req: Request, res: Response) {
-  const client = new UsersDatabase(collectionName);
+  const client = new UsersDatabase();
   try {
     const userId = req.query._id as string;
     console.log({
       location: 'users.controller.getUserById',
       info: `Got request ${JSON.stringify(req.query)}`,
     });
-    await client.start();
     const result = await client.getUserById(userId);
     if (result) {
       res.status(200).send({
@@ -70,20 +60,17 @@ export async function getUserById(req: Request, res: Response) {
       erorr: error,
       query: req.query,
     });
-  } finally {
-    await client.stop();
   }
 }
 
 export async function getSalariesByJob(req: Request, res: Response) {
-  const client = new UsersDatabase(collectionName);
+  const client = new UsersDatabase();
   try {
     const occupancy = req.query.occupancy as string;
     console.log({
       location: 'users.controller.getSalariesByJob',
       info: `Got request ${JSON.stringify(req.query)}`,
     });
-    await client.start();
 
     const result = await client.getSalariesByJob(occupancy);
     //if result.salaries.length;
@@ -106,20 +93,18 @@ export async function getSalariesByJob(req: Request, res: Response) {
       erorr: error,
       query: req.query,
     });
-  } finally {
-    await client.stop();
   }
 }
 
 export async function loginUser(req: Request, res: Response) {
-  const client = new UsersDatabase(collectionName);
+  const client = new UsersDatabase();
   try {
     const existingUser = { ...req.body } as unknown as Login;
     console.log({
       location: 'users.controller',
       info: `Got request ${JSON.stringify(req.body)} in loginUser`,
     });
-    await client.start();
+
     const result = await client.loginUser(existingUser);
     if (result) {
       res.status(200).send({
@@ -140,20 +125,18 @@ export async function loginUser(req: Request, res: Response) {
       erorr: error,
       query: req.query,
     });
-  } finally {
-    await client.stop();
   }
 }
 
 export async function createNewUser(req: Request, res: Response) {
-  const client = new UsersDatabase(collectionName);
+  const client = new UsersDatabase();
   try {
     const newUser = { ...req.body } as unknown as NewUserRequest;
     console.log({
       location: 'users.controller.createNewUser',
       info: `Got request ${JSON.stringify(req.query)}`,
     });
-    await client.start();
+
     const result = await client.createNewUser(newUser);
     if (result) {
       res.status(200).send({
@@ -174,20 +157,18 @@ export async function createNewUser(req: Request, res: Response) {
       erorr: error,
       query: req.query,
     });
-  } finally {
-    await client.stop();
   }
 }
 
 export async function updateUser(req: Request, res: Response) {
-  const client = new UsersDatabase(collectionName);
+  const client = new UsersDatabase();
   try {
     const updatedUser = { ...req.body } as unknown as UpdateRequest;
     console.log({
       location: 'users.controller',
       info: `Got request ${JSON.stringify(req.body)}`,
     });
-    await client.start();
+
     const result = await client.updateUser(updatedUser);
     if (result && result.modifiedCount > 0) {
       res.status(200).send({
@@ -214,20 +195,18 @@ export async function updateUser(req: Request, res: Response) {
       error: error,
       query: `${JSON.stringify(req.body)}`,
     });
-  } finally {
-    await client.stop();
   }
 }
 
 export async function deleteUser(req: Request, res: Response) {
-  const client = new UsersDatabase(collectionName);
+  const client = new UsersDatabase();
   try {
     const email = req.query.email as string;
     console.log({
       location: 'users.controller',
       info: `Got request ${JSON.stringify(req.query)}`,
     });
-    await client.start();
+
     const result = await client.deleteUser(email);
     if (result) {
       res.status(200).send({
@@ -248,7 +227,5 @@ export async function deleteUser(req: Request, res: Response) {
       erorr: error,
       query: req.query,
     });
-  } finally {
-    await client.stop();
   }
 }

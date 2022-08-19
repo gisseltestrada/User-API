@@ -1,41 +1,39 @@
-import { Collection, MongoClient, ObjectId, UpdateFilter } from 'mongodb';
+import { Collection, ObjectId, UpdateFilter } from 'mongodb';
 import { toPascalCase } from '../../common/helper';
-
-import {
-  NewUserRequest,
-  UpdateRequest,
-  Login,
-  EditForm,
-} from '../../models/interfaces';
+import { collections } from './connection';
+import { NewUserRequest, UpdateRequest, Login, EditForm } from '../../models/interfaces';
 
 export class UsersDatabase {
-  connectionString!: string;
-  collectionName!: string;
-  client!: MongoClient;
-  dbName!: string;
+  // connectionString!: string;
+  // collectionName!: string;
+  // client!: MongoClient;
+  // dbName!: string;
   collection!: Collection;
 
-  constructor(collectionName: string) {
-    this.collectionName = collectionName;
-    this.connectionString = process.env.connectionString || '';
-    this.dbName = process.env.dbName || '';
-    this.client = new MongoClient(this.connectionString);
+  constructor() {
+    if (collections.userCollection) {
+      this.collection = collections.userCollection;
+    }
+    // this.collectionName = collectionName;
+    // this.connectionString = process.env.connectionString || '';
+    // this.dbName = process.env.dbName || '';
+    // this.client = new MongoClient(this.connectionString);
   }
 
-  async start() {
-    await this.client.connect();
-    this.collection = this.client
-      .db(this.dbName)
-      .collection(this.collectionName);
-    // console.log({
-    //   location: "UserDatabase.start()",
-    //   info: `${this.collection.dbName}`,
-    // });
-  }
+  // async start() {
+  //   await this.client.connect();
+  //   this.collection = this.client
+  //     .db(this.dbName)
+  //     .collection(this.collectionName);
+  //   // console.log({
+  //   //   location: "UserDatabase.start()",
+  //   //   info: `${this.collection.dbName}`,
+  //   // });
+  // }
 
-  async stop() {
-    await this.client.close();
-  }
+  // async stop() {
+  //   await this.client.close();
+  // }
 
   async getUserByEmail(email: string) {
     const query = { email: email };
@@ -81,8 +79,7 @@ export class UsersDatabase {
     }
     // console.log(salariesArr);
     // const arrAvg = arr => arr.reduce((a,b) => a + b, 0) / arr.length
-    const averageSalary = (salariesArr: number[]) =>
-      salariesArr.reduce((a, b) => a + b) / salariesArr.length;
+    const averageSalary = (salariesArr: number[]) => salariesArr.reduce((a, b) => a + b) / salariesArr.length;
     return {
       average: averageSalary(salariesArr).toFixed(2),
       salaries: salariesArr,
